@@ -71,6 +71,18 @@
     (kbd (nth 2 winkeys)) #'dired-previous-line
     (kbd (nth 3 winkeys)) #'dired-find-file))
 
+;;; org agenda
+(with-eval-after-load 'org-agenda
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+  (evil-define-key 'motion org-agenda-mode-map
+    (kbd (nth 1 winkeys)) #'org-agenda-next-line
+    (kbd (nth 2 winkeys)) #'org-agenda-previous-line
+    (kbd (concat "g" (nth 1 winkeys))) #'org-agenda-next-item
+    (kbd (concat "g" (nth 2 winkeys))) #'org-agenda-previous-item
+    (kbd (concat "C-" (nth 1 winkeys))) #'org-agenda-next-item
+    (kbd (concat "C-" (nth 2 winkeys))) #'org-agenda-previous-item))
+
 ;;; fuzzy find project files
 (evil-define-key 'normal 'global (kbd "<leader>f") #'project-find-file)
 

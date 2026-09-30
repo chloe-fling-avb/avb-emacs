@@ -8,10 +8,14 @@
       make-backup-files nil
       create-lockfiles nil
       native-comp-async-report-warnings-errors 'silent
-      org-startup-truncated nil)
+      org-startup-truncated nil
+      org-agenda-files (directory-files-recursively
+                        (expand-file-name "~/notes") "\\.org\\'"))
 (menu-bar-mode -1)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))
+(when (fboundp 'scroll-bar-mode)
+  (scroll-bar-mode -1))
 
 ;;; evil
 (use-package evil
@@ -26,26 +30,49 @@
 (use-package evil-org
   :after evil org
   :config
-  (add-hook 'org-mode-hook #'evil-org-mode)
+  (setq evil-org-movement-bindings
+        `((up . ,(if workman "e" "k"))
+          (down . ,(if workman "n" "j"))
+          (left . ,(if workman "y" "h"))
+          (right . ,(if workman "o" "l"))))
+  (dolist (hook '(org-mode-hook org-capture-mode-hook org-src-mode-hook))
+    (add-hook hook #'evil-org-mode))
   (evil-org-set-key-theme '(navigation insert textobjects additional))
-  (evil-define-key 'normal 'evil-org-mode (kbd "RET") #'org-open-at-point))
+  (evil-define-key 'normal 'evil-org-mode
+    (kbd "RET") #'org-open-at-point
+    (kbd "o") #'evil-forward-char))
 
 ;;; clipboard/mouse
 (xterm-mouse-mode 1)
+(mouse-wheel-mode 1)
 
-(defvar wl-copied nil)
+(defvar terminal-copied nil)
 (unless (display-graphic-p)
-  (setq interprogram-cut-function
-        (lambda (text)
-          (setq wl-copied text)
-          (let ((proc (make-process :name "wl-copy" :command '("wl-copy")
-                                    :connection-type 'pipe :noquery t)))
-            (process-send-string proc text)
-            (process-send-eof proc)))
-        interprogram-paste-function
-        (lambda ()
-          (let ((text (shell-command-to-string "wl-paste -n 2>/dev/null")))
-            (unless (or (string-empty-p text) (equal text wl-copied)) text)))))
+  (pcase system-type
+    ('darwin
+     (setq interprogram-cut-function
+           (lambda (text)
+             (setq terminal-copied text)
+             (let ((proc (make-process :name "pbcopy" :command '("pbcopy")
+                                       :connection-type 'pipe :noquery t)))
+               (process-send-string proc text)
+               (process-send-eof proc)))
+           interprogram-paste-function
+           (lambda ()
+             (let ((text (shell-command-to-string "pbpaste 2>/dev/null")))
+               (unless (or (string-empty-p text) (equal text terminal-copied)) text)))))
+    ('gnu/linux
+     (setq interprogram-cut-function
+           (lambda (text)
+             (setq terminal-copied text)
+             (let ((proc (make-process :name "wl-copy" :command '("wl-copy")
+                                       :connection-type 'pipe :noquery t)))
+               (process-send-string proc text)
+               (process-send-eof proc)))
+           interprogram-paste-function
+           (lambda ()
+             (let ((text (shell-command-to-string "wl-paste -n 2>/dev/null")))
+               (unless (or (string-empty-p text) (equal text terminal-copied)) text)))))))
 
 ;;; tab
 (setq-default tab-width 4
@@ -132,7 +159,8 @@
   (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
 
 (use-package corfu-terminal
-  :unless (display-graphic-p)
+  :unless (or (display-graphic-p)
+              (>= emacs-major-version 31))
   :config (corfu-terminal-mode 1))
 
 (with-eval-after-load 'eglot
@@ -161,3 +189,7 @@
 (use-package rainbow-mode :hook (prog-mode text-mode))
 
 (provide 'options)
+
+;;; change cursor in insert mode
+(add-hook 'evil-insert-state-entry-hook (lambda () (send-string-to-terminal "\033[5 q")))
+(add-hook 'evil-insert-state-exit-hook  (lambda () (send-string-to-terminal "\033[2 q")))
