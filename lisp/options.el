@@ -7,7 +7,8 @@
       inhibit-startup-screen t
       make-backup-files nil
       create-lockfiles nil
-      native-comp-async-report-warnings-errors 'silent)
+      native-comp-async-report-warnings-errors 'silent
+      org-startup-truncated nil)
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -49,7 +50,7 @@
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)
 (fido-vertical-mode 1)
-(use-package doric-themes :config (load-theme 'doric-plum t))
+(use-package ef-themes :config (load-theme 'ef-winter t))
 
 ;;; statusline
 (defun stl-filepath ()

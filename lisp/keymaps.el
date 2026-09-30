@@ -74,6 +74,24 @@
 ;;; fuzzy find project files
 (evil-define-key 'normal 'global (kbd "<leader>f") #'project-find-file)
 
+;;; create new org note
+(defun create-org-note ()
+  (interactive)
+  (let* ((title (read-string "Note title: "))
+         (filename (concat title ".org"))
+         (filepath (expand-file-name filename (file-name-directory (or buffer-file-name default-directory))))
+         (date (format-time-string "%Y-%m-%d")))
+    (with-temp-file filepath
+      (insert (format "#+TITLE: %s\n" title))
+      (insert (format "#+DATE: %s\n" date))
+      (insert "#+FILETAGS: \n\n"))
+    (find-file filepath)
+    (end-of-line 3)
+    (evil-insert-state)))
+
+(evil-define-key 'normal 'global (kbd "<leader>+") #'create-org-note)
+
+
 ;;; quick buffers
 (evil-define-key 'normal 'global (kbd "<leader>b") #'switch-to-buffer)
 

@@ -2,3 +2,5 @@ eln-cache/
 transient/
 auto-save-list/
 elpa/
+result
+result-*
