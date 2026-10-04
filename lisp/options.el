@@ -151,8 +151,6 @@
 (use-package lua-mode :custom (lua-indent-level 4))
 (use-package markdown-mode :custom (markdown-header-scaling t))
 
-(global-flymake-mode -1)
-
 ;;; lsp
 (use-package corfu
   :custom (corfu-preselect 'prompt)
@@ -166,8 +164,6 @@
   :unless (or (display-graphic-p)
               (>= emacs-major-version 31))
   :config (corfu-terminal-mode 1))
-
-(global-flymake-mode -1)
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs '(svelte-mode "svelteserver" "--stdio"))
