@@ -2,7 +2,7 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (require 'use-package)
-(setq use-package-always-ensure t
+(setq use-package-always-ensure nil
       custom-file (locate-user-emacs-file "custom.el")
       inhibit-startup-screen t
       make-backup-files nil
@@ -151,6 +151,8 @@
 (use-package lua-mode :custom (lua-indent-level 4))
 (use-package markdown-mode :custom (markdown-header-scaling t))
 
+(global-flymake-mode -1)
+
 ;;; lsp
 (use-package corfu
   :custom (corfu-preselect 'prompt)
@@ -158,26 +160,32 @@
   (global-corfu-mode 1)
   (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
 
+(flymake-mode -1)
+
 (use-package corfu-terminal
   :unless (or (display-graphic-p)
               (>= emacs-major-version 31))
   :config (corfu-terminal-mode 1))
 
+(global-flymake-mode -1)
+
 (with-eval-after-load 'eglot
-  (add-to-list 'eglot-server-programs '(svelte-mode "svelteserver" "--stdio")))
+  (add-to-list 'eglot-server-programs '(svelte-mode "svelteserver" "--stdio"))
+  (setq eglot-stay-out-of '(flymake)))
 
 (dolist (hook '(js-mode-hook typescript-mode-hook lua-mode-hook c-mode-hook c++-mode-hook
                 python-mode-hook rust-mode-hook nix-mode-hook svelte-mode-hook))
   (add-hook hook #'eglot-ensure))
+
+(setq eglot-stay-out-of '(flymake))
 
 ;; autotrigger completion only in lsp buffers
 (add-hook 'eglot-managed-mode-hook
           (lambda ()
             (when (eglot-managed-p)
               (setq-local corfu-auto t)
-              (corfu-mode 1))))
-
-(setq flymake-show-diagnostics-at-end-of-line t)
+              (corfu-mode 1)
+              (flymake-mode -1))))
 
 (add-hook 'before-save-hook
           (lambda ()
