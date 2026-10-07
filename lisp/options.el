@@ -141,6 +141,8 @@
                 (:eval (when (mode-line-window-selected-p)
                          `("[" mode-name "] [%p %l:%C] " ,(stl-moon) " " ,(format-time-string "%H:%M"))))))
 
+(setq diary-file "~/notes/diary")
+
 ;; refresh clock once a minute
 (run-at-time t 60 #'force-mode-line-update t)
 
