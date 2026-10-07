@@ -72,6 +72,8 @@
     (kbd (nth 3 winkeys)) #'dired-find-file))
 
 ;;; org agenda
+(evil-define-key 'normal 'global (kbd "<leader>a") #'org-agenda)
+
 (with-eval-after-load 'org-agenda
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)

@@ -1,5 +1,5 @@
 ;;; -*- lexical-binding: t -*-
-(defvar workman t)
+(defvar workman nil)
 
 (add-to-list 'load-path (expand-file-name "lisp" (file-name-directory load-file-name)))
 
