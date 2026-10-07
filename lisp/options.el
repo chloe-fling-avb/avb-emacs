@@ -125,13 +125,21 @@
                 (and removed (> removed 0) (format " -%d" removed))
                 "]")))))
 
+;; approximate phase from the mean synodic month, relative to the 2000-01-06 new moon
+(defun stl-moon ()
+  (let* ((synodic 29.530588853)
+         (days (/ (float-time (time-subtract nil (date-to-time "2000-01-06T18:14:00Z")))
+                  86400.0))
+         (idx (mod (round (* 8 (/ (mod days synodic) synodic))) 8)))
+    (aref ["○" "◔+" "◑+" "◕+" "●" "◕-" "◐-" "◔-"] idx)))
+
 (setq-default mode-line-format
               '((:eval (if (mode-line-window-selected-p)
                            `("[" ,(stl-filepath) "%b] " ,(stl-git))
                          " %b"))
                 mode-line-format-right-align
                 (:eval (when (mode-line-window-selected-p)
-                         `("[" mode-name "] [%p %l:%C] " ,(format-time-string "%H:%M"))))))
+                         `("[" mode-name "] [%p %l:%C] " ,(stl-moon) " " ,(format-time-string "%H:%M"))))))
 
 ;; refresh clock once a minute
 (run-at-time t 60 #'force-mode-line-update t)
