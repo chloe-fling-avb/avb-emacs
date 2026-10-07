@@ -42,6 +42,11 @@
     (kbd "RET") #'org-open-at-point
     (kbd "o") #'evil-forward-char))
 
+;;; zoom mode
+(use-package zoom)
+(custom-set-variables
+ '(zoom-mode t))
+
 ;;; clipboard/mouse
 (xterm-mouse-mode 1)
 (mouse-wheel-mode 1)
