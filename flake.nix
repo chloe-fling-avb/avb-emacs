@@ -28,6 +28,7 @@
         with pkgs;
         [
           typescript-language-server
+          lemminx
           svelte-language-server
           lua-language-server
           ccls

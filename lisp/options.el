@@ -9,6 +9,8 @@
       create-lockfiles nil
       native-comp-async-report-warnings-errors 'silent
       org-startup-truncated nil
+      org-log-done 'time
+      org-todo-keywords '((sequence "TODO" "IN PROGRESS" "|" "DONE"))
       org-agenda-files (directory-files-recursively
                         (expand-file-name "~/notes") "\\.org\\'"))
 (menu-bar-mode -1)
@@ -20,12 +22,25 @@
 ;;; evil
 (use-package evil
   :init
-  (setq evil-want-C-i-jump nil ; frees TAB for org in terminals
+  (setq evil-want-keybinding nil
+        evil-want-C-i-jump nil ; frees TAB for org in terminals
         evil-want-C-u-scroll t
         evil-want-Y-yank-to-eol t
         evil-undo-system 'undo-redo)
+(add-to-list 'browse-url-default-handlers
+             '(pr-review-url-parse . pr-review-open-url))
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-ex-define-cmd "prr" #'pr-review)
+  (evil-ex-define-cmd "prs" #'pr-review-search)
+  (evil-ex-define-cmd "prn" #'pr-review-notification))
+
+;; Give Magit Evil-aware maps, including its transient menus.
+(use-package evil-collection
+  :ensure t
+  :after evil
+  :config
+  (evil-collection-init '(magit)))
 
 (use-package evil-org
   :after evil org
@@ -42,10 +57,14 @@
     (kbd "RET") #'org-open-at-point
     (kbd "o") #'evil-forward-char))
 
+(with-eval-after-load 'org-colview
+  (setq org-columns-default-format
+        "%50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM"))
+
 ;;; zoom mode
 (use-package zoom)
 (custom-set-variables
- '(zoom-mode t))
+ '(zoom-mode nil))
 
 ;;; clipboard/mouse
 (xterm-mouse-mode 1)
@@ -89,7 +108,7 @@
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)
 (fido-vertical-mode 1)
-(use-package ef-themes :config (load-theme 'ef-winter t))
+(use-package ef-themes :config (load-theme 'ef-autumn t))
 
 ;;; statusline
 (defun stl-filepath ()
@@ -101,6 +120,11 @@
       (unless (equal path "./") path))))
 
 (defvar-local stl-git-counts nil)
+
+;; magit
+(require 'package)
+(add-to-list 'package-archives
+             '("melpa" . "https://melpa.org/packages/") t)
 
 ;; hooks diff-hl's hunk list: (line inserts deletes type)
 (defun stl-git-count (changes &rest _)
@@ -141,7 +165,13 @@
                 (:eval (when (mode-line-window-selected-p)
                          `("[" mode-name "] [%p %l:%C] " ,(stl-moon) " " ,(format-time-string "%H:%M"))))))
 
-(setq diary-file "~/notes/diary")
+(setq diary-file "~/notes/diary"
+      org-agenda-include-diary t)
+
+(require 'appt)
+(setq appt-message-warning-time 5
+      appt-display-interval 1)
+(appt-activate 1)
 
 ;; refresh clock once a minute
 (run-at-time t 60 #'force-mode-line-update t)
@@ -173,34 +203,49 @@
   (global-corfu-mode 1)
   (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
 
-(flymake-mode -1)
-
 (use-package corfu-terminal
   :unless (or (display-graphic-p)
               (>= emacs-major-version 31))
   :config (corfu-terminal-mode 1))
 
-(with-eval-after-load 'eglot
+(use-package eglot
+  :config
+  ;; Pyright asks Eglot to make one native file watch per workspace directory.
+  ;; Large macOS projects exhaust the file-descriptor limit.  Tell Pyright we
+  ;; do not support dynamic file-watch registration before it initializes.
+  (defun config-eglot-client-capabilities (original server)
+    (let ((capabilities (funcall original server)))
+      (when (memq 'python-mode (eglot--major-modes server))
+        (let* ((workspace (plist-get capabilities :workspace))
+               (file-watches (plist-get workspace :didChangeWatchedFiles)))
+          (plist-put file-watches :dynamicRegistration :json-false)
+          (plist-put workspace :didChangeWatchedFiles file-watches)
+          (plist-put capabilities :workspace workspace)))
+      capabilities))
+  (advice-add 'eglot-client-capabilities :around
+              #'config-eglot-client-capabilities)
   (add-to-list 'eglot-server-programs '(svelte-mode "svelteserver" "--stdio"))
-  (setq eglot-stay-out-of '(flymake)))
+  (add-to-list 'eglot-server-programs '((nxml-mode xml-mode) "lemminx"))
+  (add-to-list 'eglot-server-programs
+               '((python-mode python-ts-mode) "pyright-langserver" "--stdio")))
 
-(dolist (hook '(js-mode-hook typescript-mode-hook lua-mode-hook c-mode-hook c++-mode-hook
-                python-mode-hook rust-mode-hook nix-mode-hook svelte-mode-hook))
+(dolist (hook '(js-mode-hook typescript-mode-hook nxml-mode-hook xml-mode-hook
+                lua-mode-hook c-mode-hook c++-mode-hook python-mode-hook rust-mode-hook
+                nix-mode-hook svelte-mode-hook))
   (add-hook hook #'eglot-ensure))
-
-(setq eglot-stay-out-of '(flymake))
 
 ;; autotrigger completion only in lsp buffers
 (add-hook 'eglot-managed-mode-hook
           (lambda ()
             (when (eglot-managed-p)
               (setq-local corfu-auto t)
-              (corfu-mode 1)
-              (flymake-mode -1))))
+              (corfu-mode 1))))
 
 (add-hook 'before-save-hook
           (lambda ()
-            (when (and (fboundp 'eglot-managed-p) (eglot-managed-p)
+            (when (and (not (derived-mode-p 'typescript-mode 'typescript-ts-mode
+                                            'tsx-ts-mode))
+                       (fboundp 'eglot-managed-p) (eglot-managed-p)
                        (eglot-server-capable :documentFormattingProvider))
               (eglot-format-buffer))))
 
@@ -209,6 +254,12 @@
 
 (provide 'options)
 
-;;; change cursor in insert mode
-(add-hook 'evil-insert-state-entry-hook (lambda () (send-string-to-terminal "\033[5 q")))
-(add-hook 'evil-insert-state-exit-hook  (lambda () (send-string-to-terminal "\033[2 q")))
+;;; change cursor in insert mode (terminal frames only)
+(add-hook 'evil-insert-state-entry-hook
+          (lambda ()
+            (unless (display-graphic-p)
+              (send-string-to-terminal "\033[5 q"))))
+(add-hook 'evil-insert-state-exit-hook
+          (lambda ()
+            (unless (display-graphic-p)
+              (send-string-to-terminal "\033[2 q"))))

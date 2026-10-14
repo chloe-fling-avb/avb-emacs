@@ -3,6 +3,53 @@
 
 (evil-set-leader 'normal (kbd "SPC"))
 
+;;; Magit section navigation: keep the configured layout (Workman or QWERTY).
+(with-eval-after-load 'magit
+  (evil-define-key 'normal magit-mode-map
+    (kbd (nth 0 winkeys)) #'magit-section-up
+    (kbd (nth 1 winkeys)) #'magit-section-forward
+    (kbd (nth 2 winkeys)) #'magit-section-backward
+    (kbd (nth 3 winkeys)) #'magit-visit-thing))
+
+(defun my-pr-review-show-diff-line-numbers (&rest _)
+  (let ((old-width 1)
+        (new-width 1)
+        lines)
+    (remove-overlays (point-min) (point-max) 'my-pr-review-line-number t)
+    (save-excursion
+      (goto-char (or pr-review--diff-begin-point (point-min)))
+      (beginning-of-line)
+      (while (< (point) (point-max))
+        (let ((old (alist-get 'line (get-text-property (point) 'pr-review-diff-line-left)))
+              (new (alist-get 'line (get-text-property (point) 'pr-review-diff-line-right))))
+          (when (or old new)
+            (setq old (and old (number-to-string old))
+                  new (and new (number-to-string new))
+                  old-width (max old-width (length (or old "")))
+                  new-width (max new-width (length (or new ""))))
+            (push (list (point) old new) lines)))
+        (forward-line 1)))
+    (dolist (line lines)
+      (pcase-let ((`(,pos ,old ,new) line))
+        (let ((overlay (make-overlay pos pos nil t t)))
+          (overlay-put overlay 'my-pr-review-line-number t)
+          (overlay-put
+           overlay 'before-string
+           (concat
+            (propertize (format (format "%%%ds " old-width) (or old ""))
+                        'face (if old 'diff-removed 'line-number))
+            (propertize (format (format "%%%ds " new-width) (or new ""))
+                        'face (if new 'diff-added 'line-number))
+            (propertize "| " 'face 'line-number))))))))
+
+(with-eval-after-load 'pr-review
+  (advice-add 'pr-review--refresh-internal :after #'my-pr-review-show-diff-line-numbers)
+  (evil-define-key '(normal motion) pr-review-mode-map
+    (kbd (nth 0 winkeys)) #'evil-backward-char
+    (kbd (nth 1 winkeys)) #'next-line-dwim
+    (kbd (nth 2 winkeys)) #'previous-line-dwim
+    (kbd (nth 3 winkeys)) #'evil-forward-char))
+
 ;;; normal
 ;;; C-s save (old habits)
 (evil-define-key 'normal 'global (kbd "C-s") #'save-buffer)
@@ -29,11 +76,11 @@
          for flag in '("-L" "-D" "-U" "-R")
          do (evil-define-key 'normal 'global (kbd (concat "C-" key)) (tmux-nav move flag)))
 
-;;; resize windows with C-<direction>
-(evil-define-key 'normal 'global (kbd "C-<up>") (lambda () (interactive) (evil-window-decrease-height 2)))
-(evil-define-key 'normal 'global (kbd "C-<down>") (lambda () (interactive) (evil-window-increase-height 2)))
-(evil-define-key 'normal 'global (kbd "C-<right>") (lambda () (interactive) (evil-window-decrease-width 2)))
-(evil-define-key 'normal 'global (kbd "C-<left>") (lambda () (interactive) (evil-window-increase-width 2)))
+;;; resize windows with C-S-<direction>
+(evil-define-key 'normal 'global (kbd "C-S-<up>") (lambda () (interactive) (evil-window-decrease-height 2)))
+(evil-define-key 'normal 'global (kbd "C-S-<down>") (lambda () (interactive) (evil-window-increase-height 2)))
+(evil-define-key 'normal 'global (kbd "C-S-<right>") (lambda () (interactive) (evil-window-decrease-width 2)))
+(evil-define-key 'normal 'global (kbd "C-S-<left>") (lambda () (interactive) (evil-window-increase-width 2)))
 
 ;; screen lines when wrapped, real lines with a count (matches relative numbers)
 (evil-define-motion next-line-dwim (count)
@@ -69,7 +116,11 @@
     (kbd (nth 0 winkeys)) #'dired-up-directory
     (kbd (nth 1 winkeys)) #'dired-next-line
     (kbd (nth 2 winkeys)) #'dired-previous-line
-    (kbd (nth 3 winkeys)) #'dired-find-file))
+    (kbd (nth 3 winkeys)) #'dired-find-file
+    (kbd "RET") #'dired-find-file
+    (kbd "+") #'dired-create-directory
+    (kbd "C") #'dired-do-copy
+    (kbd "R") #'dired-do-rename))
 
 ;;; org agenda
 (evil-define-key 'normal 'global (kbd "<leader>a") #'org-agenda)
@@ -85,8 +136,9 @@
     (kbd (concat "C-" (nth 1 winkeys))) #'org-agenda-next-item
     (kbd (concat "C-" (nth 2 winkeys))) #'org-agenda-previous-item))
 
-;;; fuzzy find project files
+;;; fuzzy find project files and open Magit
 (evil-define-key 'normal 'global (kbd "<leader>f") #'project-find-file)
+(evil-define-key 'normal 'global (kbd "<leader>g") #'magit-status)
 
 ;;; create new org note
 (defun create-org-note ()
@@ -98,7 +150,10 @@
     (with-temp-file filepath
       (insert (format "#+TITLE: %s\n" title))
       (insert (format "#+DATE: %s\n" date))
-      (insert "#+FILETAGS: \n\n"))
+      (insert "#+FILETAGS: \n")
+    (insert "#+PR: \n")
+    (insert "#+BEGIN: clocktable :scope file \n#+END \n")
+    (insert "#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n"))
     (find-file filepath)
     (end-of-line 3)
     (evil-insert-state)))
