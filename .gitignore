@@ -1,6 +1,10 @@
-eln-cache/
-transient/
 auto-save-list/
+eln-cache/
 elpa/
+transient/
+url/
+
+custom.el
 result
 result-*
+tramp

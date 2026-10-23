@@ -104,8 +104,34 @@
     (kbd "M-e") #'evil-forward-word-end
     (kbd "M-o") #'evil-open-below))
 
-;;; easy terminal
-(evil-define-key 'normal 'global (kbd "<leader>t") (lambda () (interactive) (ansi-term (getenv "SHELL"))))
+(defun my/org-find-file-by-filetag ()
+  (interactive)
+  (let (tag-files)
+    (dolist (file org-agenda-files)
+      (with-temp-buffer
+        (insert-file-contents file)
+        (goto-char (point-min))
+        (when (re-search-forward "^#[+]FILETAGS:[ \t]*\\(.*\\)$" nil t)
+          (dolist (tag (split-string (match-string 1) ":" t "[ \t]+"))
+            (push (cons (downcase tag) file) tag-files)))))
+    (setq tag-files (nreverse tag-files))
+    (unless tag-files
+      (user-error "No file tags found in Org agenda files"))
+    (let* ((tag (completing-read "File tag: "
+                                 (delete-dups (mapcar #'car tag-files)) nil t))
+           matches)
+      (dolist (entry tag-files)
+        (when (equal (car entry) tag)
+          (push (cdr entry) matches)))
+      (setq matches (delete-dups matches))
+      (let* ((notes-dir (expand-file-name "~/notes"))
+             (choices (mapcar (lambda (file)
+                                (cons (file-relative-name file notes-dir) file))
+                              matches))
+             (choice (completing-read "Open note: " choices nil t)))
+        (find-file (cdr (assoc choice choices)))))))
+
+(evil-define-key 'normal 'global (kbd "<leader>t") #'my/org-find-file-by-filetag)
 
 ;;; file browser, opens on current file
 (evil-define-key 'normal 'global (kbd "<leader>e") #'dired-jump)
