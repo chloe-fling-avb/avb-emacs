@@ -66,6 +66,22 @@
 (custom-set-variables
  '(zoom-mode nil))
 
+;;; dired preview
+(use-package dired-preview
+  :ensure t
+  :config
+  ;; Default values for demo purposes
+  (setq dired-preview-delay 0.7)
+  (add-to-list 'dired-preview-trigger-commands 'evil-next-line)
+  (add-to-list 'dired-preview-trigger-commands 'evil-previous-line)
+  (setq dired-preview-max-size (expt 2 20))
+  (setq dired-preview-ignored-extensions
+        '("mkv" "webm" "mp4"
+          "mp3" "ogg" "m4a" "flac" "wav"
+          "gz" "zst" "tar" "xz" "rar" "zip" "iso"
+          ".DS_Store"))
+  (dired-preview-global-mode 1))
+
 ;;; clipboard/mouse
 (xterm-mouse-mode 1)
 (mouse-wheel-mode 1)
@@ -104,11 +120,12 @@
               c-basic-offset 4)
 
 ;;; ui
+(set-face-attribute 'default nil :family "Aporetic Sans Mono")
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)
 (fido-vertical-mode 1)
-(use-package ef-themes :config (load-theme 'ef-autumn t))
+(use-package ef-themes :config (load-theme 'ef-dream t))
 
 ;;; statusline
 (defun stl-filepath ()
@@ -165,9 +182,17 @@
                 (:eval (when (mode-line-window-selected-p)
                          `("[" mode-name "] [%p %l:%C] " ,(stl-moon) " " ,(format-time-string "%H:%M"))))))
 
+;; org mode options
+;;; prettiness
+(setq org-hide-emphasis-markers t)
+  (font-lock-add-keywords 'org-mode
+                          '(("^ *\\([-]\\) "
+                             (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+;;; diary in a sensible location
 (setq diary-file "~/notes/diary"
       org-agenda-include-diary t)
 
+;;; appt reminders
 (require 'appt)
 (setq appt-message-warning-time 5
       appt-display-interval 1)

@@ -6,7 +6,8 @@
 (add-hook 'org-mode-hook
           (lambda ()
             (flyspell-mode 1)
-            (flyspell-buffer)))
+            (flyspell-buffer)
+            (org-hide-drawer-all)))
 
 (require 'options)
 (require 'keymaps)
