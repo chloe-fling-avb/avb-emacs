@@ -120,7 +120,7 @@
               c-basic-offset 4)
 
 ;;; ui
-(set-face-attribute 'default nil :family "Aporetic Sans Mono")
+(set-face-attribute 'default nil :family "Aporetic Serif Mono" :height 180)
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)

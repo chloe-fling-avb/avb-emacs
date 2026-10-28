@@ -167,21 +167,45 @@
 (evil-define-key 'normal 'global (kbd "<leader>g") #'magit-status)
 
 ;;; create new org note
+(defcustom my/org-note-templates
+  '(("hiring" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+REPO:\n#+SITE:\n#+CATEGORY: hiring\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* SPA\n** Pros\n** Cons\n\n* Repo\n** Pros\n** Cons\n\n* Decision\n")
+    ("standup" . "#+TITLE: {{tmrw date}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+CATEGORY: standup\n\n* TODO Yesterday\nDEADLINE: <{{date}}>\n** Dev\n** Review\n\n* TODO Today\nDEADLINE: <{{tmrw date}}>\n** Dev\n** Review\n\n* Push\n")
+    ("dev" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: dev\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* TODO Issue\n* TODO Functional Requirements [/]\n* TODO Fix\n* TODO Review\n")
+    ("review" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: review\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* TODO Issue\n* TODO Review\n")
+    ("generic" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: generic\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n"))
+  "Org note templates. Use {{title}}, {{date}}, and {{tmrw date}} placeholders."
+  :type '(alist :key-type (string :tag "Template name")
+                :value-type (string :tag "Template"))
+  :group 'org)
+
 (defun create-org-note ()
   (interactive)
-  (let* ((title (read-string "Note title: "))
+  (let* ((template-name (completing-read "Note template: "
+                                         (mapcar #'car my/org-note-templates)
+                                         nil t nil nil "generic"))
+         (now (current-time))
+         (date (format-time-string "%Y-%m-%d" now))
+         (tomorrow-date (format-time-string "%Y-%m-%d"
+                                            (time-add now (days-to-time 1))))
+         (title (if (equal template-name "standup")
+                    tomorrow-date
+                  (read-string "Note title: ")))
          (filename (concat title ".org"))
-         (filepath (expand-file-name filename (file-name-directory (or buffer-file-name default-directory))))
-         (date (format-time-string "%Y-%m-%d")))
+         (filepath (expand-file-name filename
+                                     (file-name-directory (or buffer-file-name default-directory))))
+         (content (cdr (assoc template-name my/org-note-templates))))
+    (dolist (replacement `(("{{title}}" . ,title)
+                           ("{{date}}" . ,date)
+                           ("{{tmrw date}}" . ,tomorrow-date)))
+      (setq content (replace-regexp-in-string (regexp-quote (car replacement))
+                                              (cdr replacement) content t t)))
     (with-temp-file filepath
-      (insert (format "#+TITLE: %s\n" title))
-      (insert (format "#+DATE: %s\n" date))
-      (insert "#+FILETAGS: \n")
-    (insert "#+PR: \n")
-    (insert "#+BEGIN: clocktable :scope file \n#+END \n")
-    (insert "#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n"))
+      (insert content))
+    (set-file-modes filepath #o755)
     (find-file filepath)
-    (end-of-line 3)
+    (setq buffer-read-only nil)
+    (goto-char (point-min))
+    (search-forward "\n\n" nil t)
     (evil-insert-state)))
 
 (evil-define-key 'normal 'global (kbd "<leader>+") #'create-org-note)
