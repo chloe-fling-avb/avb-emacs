@@ -6,9 +6,10 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(corfu-terminal diff-hl dired-preview ef-themes evil-collection
-                    evil-org evil-snipe ghostel lua-mode nix-mode
-                    org-bullets pr-review rainbow-mode rust-mode
-                    svelte-mode typescript-mode zoom))
+                    evil-org evil-snipe ghostel lua-mode
+                    markdown-table-wrap md-ts-mode nix-mode
+                    org-bullets pilish pr-review rainbow-mode
+                    rust-mode svelte-mode typescript-mode zoom))
  '(zoom-mode nil nil (zoom)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

@@ -91,7 +91,7 @@
   :type line
   (if count (evil-previous-line count) (evil-previous-visual-line 1)))
 
-(evil-define-key '(normal visual) 'global
+(evil-define-key '(normal visual motion) 'global
   (kbd (nth 0 winkeys)) #'evil-backward-char
   (kbd (nth 1 winkeys)) #'next-line-dwim
   (kbd (nth 2 winkeys)) #'previous-line-dwim

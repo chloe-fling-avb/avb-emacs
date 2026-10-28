@@ -33,7 +33,9 @@
   (evil-mode 1)
   (evil-ex-define-cmd "prr" #'pr-review)
   (evil-ex-define-cmd "prs" #'pr-review-search)
-  (evil-ex-define-cmd "prn" #'pr-review-notification))
+  (evil-ex-define-cmd "prn" #'pr-review-notification)
+  (evil-ex-define-cmd "pi" #'pilish)
+  (evil-ex-define-cmd "term" #'ghostel))
 
 ;; Give Magit Evil-aware maps, including its transient menus.
 (use-package evil-collection
@@ -65,6 +67,18 @@
 (use-package zoom)
 (custom-set-variables
  '(zoom-mode nil))
+
+;;; ghostel
+(use-package ghostel
+  :ensure t)
+
+;;; pilish
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(package-refresh-contents)
+(use-package pilish)
+(setq pilish-evil-integration nil)
 
 ;;; dired preview
 (use-package dired-preview
@@ -120,6 +134,14 @@
               c-basic-offset 4)
 
 ;;; ui
+(add-to-list 'display-buffer-alist
+             '(".*" (display-buffer-same-window)))
+(setq pop-up-windows nil
+      switch-to-buffer-obey-display-actions t)
+(defun config-switch-to-buffer-other-window (_original buffer &optional norecord)
+  (switch-to-buffer buffer norecord))
+(advice-add 'switch-to-buffer-other-window :around
+            #'config-switch-to-buffer-other-window)
 (set-face-attribute 'default nil :family "Aporetic Serif Mono" :height 180)
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
