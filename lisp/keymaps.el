@@ -181,6 +181,22 @@
                 :value-type (string :tag "Template"))
   :group 'org)
 
+(defun my/org-create-note-from-template (template-name title date tomorrow-date filepath)
+  (let ((content (cdr (assoc template-name my/org-note-templates))))
+    (dolist (replacement `(("{{title}}" . ,title)
+                           ("{{date}}" . ,date)
+                           ("{{tmrw date}}" . ,tomorrow-date)))
+      (setq content (replace-regexp-in-string (regexp-quote (car replacement))
+                                              (cdr replacement) content t t)))
+    (with-temp-file filepath
+      (insert content))
+    (set-file-modes filepath #o755)
+    (find-file filepath)
+    (setq buffer-read-only nil)
+    (goto-char (point-min))
+    (search-forward "\n\n" nil t)
+    (evil-insert-state)))
+
 (defun create-org-note ()
   (interactive)
   (let* ((template-name (completing-read "Note template: "
@@ -195,21 +211,28 @@
                   (read-string "Note title: ")))
          (filename (concat title ".org"))
          (filepath (expand-file-name filename
-                                     (file-name-directory (or buffer-file-name default-directory))))
-         (content (cdr (assoc template-name my/org-note-templates))))
-    (dolist (replacement `(("{{title}}" . ,title)
-                           ("{{date}}" . ,date)
-                           ("{{tmrw date}}" . ,tomorrow-date)))
-      (setq content (replace-regexp-in-string (regexp-quote (car replacement))
-                                              (cdr replacement) content t t)))
-    (with-temp-file filepath
-      (insert content))
-    (set-file-modes filepath #o755)
-    (find-file filepath)
-    (setq buffer-read-only nil)
-    (goto-char (point-min))
-    (search-forward "\n\n" nil t)
-    (evil-insert-state)))
+                                     (file-name-directory (or buffer-file-name default-directory)))))
+    (my/org-create-note-from-template template-name title date tomorrow-date filepath)))
+
+(defun my/open-standup-note ()
+  (interactive)
+  (let* ((now (current-time))
+         (target-time (if (< (string-to-number (format-time-string "%H" now)) 10)
+                          now
+                        (time-add now (days-to-time 1))))
+         (target-date (format-time-string "%Y-%m-%d" target-time))
+         (previous-date (format-time-string
+                         "%Y-%m-%d"
+                         (time-subtract target-time (days-to-time 1))))
+         (month-directory (downcase (format-time-string "%b-%y" target-time)))
+         (filepath (expand-file-name
+                    (format "standup/%s/%s.org" month-directory target-date)
+                    "~/notes")))
+    (if (file-exists-p filepath)
+        (find-file filepath)
+      (make-directory (file-name-directory filepath) t)
+      (my/org-create-note-from-template "standup" target-date previous-date
+                                         target-date filepath))))
 
 (evil-define-key 'normal 'global (kbd "<leader>+") #'create-org-note)
 

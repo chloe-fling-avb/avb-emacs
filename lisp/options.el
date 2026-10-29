@@ -88,7 +88,9 @@
         '(((nil "Projects" "Open ~/projects"
              (lambda (&rest _) (dired "~/projects")))
            (nil "Notes" "Open ~/notes"
-            (lambda (&rest _) (dired "~/notes")))))
+            (lambda (&rest _) (dired "~/notes")))
+           (nil "Standup" "Open the current standup note"
+            (lambda (&rest _) (my/open-standup-note)))))
         dashboard-startupify-list
         '(dashboard-insert-banner
           dashboard-insert-newline
