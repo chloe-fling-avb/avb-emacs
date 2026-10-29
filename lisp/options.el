@@ -72,6 +72,35 @@
 (use-package ghostel
   :ensure t)
 
+;;; dashboard
+(use-package dashboard
+  :ensure t
+  :config
+  (setq dashboard-banner-logo-title "イーマクス"
+        dashboard-items '((recents . 10) (agenda . 7))
+        dashboard-week-agenda t
+        dashboard-agenda-show-all t
+        dashboard-footer-messages
+        '("一天到晚忙来忙去，屁点钱都没挣到 \n Whole Day I'm Fucking Busy Only Get Few Money"
+        "ＢＯＲＮ ＴＯ ＤＩＥ \nWORLD IS A FUCK \n鬼神 Merge Em All 1989 \nI am slop man \n410,757,864,530 AI PRs")
+        dashboard-startup-banner "~/Downloads/sls.jpg"
+        dashboard-navigator-buttons
+        '(((nil "Projects" "Open ~/projects"
+             (lambda (&rest _) (dired "~/projects")))
+           (nil "Notes" "Open ~/notes"
+            (lambda (&rest _) (dired "~/notes")))))
+        dashboard-startupify-list
+        '(dashboard-insert-banner
+          dashboard-insert-newline
+          dashboard-insert-banner-title
+          dashboard-insert-newline
+          dashboard-insert-navigator
+          dashboard-insert-init-info
+          dashboard-insert-items
+          dashboard-insert-newline
+          dashboard-insert-footer))
+  (dashboard-setup-startup-hook))
+
 ;;; pilish
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
@@ -134,12 +163,25 @@
               c-basic-offset 4)
 
 ;;; ui
+(defun config-dired-preview-buffer-p (buffer &rest _)
+  (and (boundp 'dired-preview--buffers)
+       (memq (get-buffer buffer) dired-preview--buffers)))
+
+(defun config-magit-buffer-p (buffer)
+  (let ((buffer (get-buffer buffer)))
+    (and buffer
+         (with-current-buffer buffer
+           (derived-mode-p 'magit-mode)))))
+
 (add-to-list 'display-buffer-alist
-             '(".*" (display-buffer-same-window)))
-(setq pop-up-windows nil
-      switch-to-buffer-obey-display-actions t)
-(defun config-switch-to-buffer-other-window (_original buffer &optional norecord)
-  (switch-to-buffer buffer norecord))
+             '((not (or (derived-mode . magit-mode)
+                        config-dired-preview-buffer-p))
+               (display-buffer-same-window)))
+(defun config-switch-to-buffer-other-window (original buffer &optional norecord)
+  (if (or (derived-mode-p 'magit-mode)
+          (config-magit-buffer-p buffer))
+      (funcall original buffer norecord)
+    (switch-to-buffer buffer norecord)))
 (advice-add 'switch-to-buffer-other-window :around
             #'config-switch-to-buffer-other-window)
 (set-face-attribute 'default nil :family "Aporetic Serif Mono" :height 180)
