@@ -101,7 +101,27 @@
           dashboard-insert-items
           dashboard-insert-newline
           dashboard-insert-footer))
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (defun config-dashboard-diary-agenda ()
+    (require 'diary-lib)
+    (when (file-exists-p diary-file)
+      (mapcar
+       (lambda (entry)
+         (let* ((date (car entry))
+                (time (encode-time 0 0 0 (nth 1 date) (car date) (nth 2 date)))
+                (item (format "%s %s"
+                              (format-time-string dashboard-agenda-time-string-format time)
+                              (cadr entry))))
+           (propertize item
+                       'dashboard-agenda-file diary-file
+                       'dashboard-agenda-loc 1)))
+       (diary-list-entries (calendar-current-date)
+                           (if dashboard-week-agenda 8 1)
+                           t))))
+  (defun config-dashboard-agenda-with-diary (original &rest args)
+    (append (config-dashboard-diary-agenda) (apply original args)))
+  (advice-add 'dashboard-get-agenda :around
+              #'config-dashboard-agenda-with-diary))
 
 ;;; pilish
 (require 'package)

@@ -217,13 +217,15 @@
 (defun my/open-standup-note ()
   (interactive)
   (let* ((now (current-time))
-         (target-time (if (< (string-to-number (format-time-string "%H" now)) 10)
-                          now
-                        (time-add now (days-to-time 1))))
+         (target-offset (cond
+                         ((< (string-to-number (format-time-string "%H" now)) 10) 0)
+                         ((= (nth 6 (decode-time now)) 5) 3)
+                         (t 1)))
+         (target-time (time-add now (days-to-time target-offset)))
          (target-date (format-time-string "%Y-%m-%d" target-time))
          (previous-date (format-time-string
                          "%Y-%m-%d"
-                         (time-subtract target-time (days-to-time 1))))
+                         (time-add now (days-to-time (if (= target-offset 0) -1 0)))))
          (month-directory (downcase (format-time-string "%b-%y" target-time)))
          (filepath (expand-file-name
                     (format "standup/%s/%s.org" month-directory target-date)
