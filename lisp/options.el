@@ -82,15 +82,20 @@
         dashboard-agenda-show-all t
         dashboard-footer-messages
         '("一天到晚忙来忙去，屁点钱都没挣到 \n Whole Day I'm Fucking Busy Only Get Few Money"
-        "ＢＯＲＮ ＴＯ ＤＩＥ \nWORLD IS A FUCK \n鬼神 Merge Em All 1989 \nI am slop man \n410,757,864,530 AI PRs")
-        dashboard-startup-banner "~/Downloads/sls.jpg"
+          "ＢＯＲＮ ＴＯ ＤＩＥ \nWORLD IS A FUCK \n鬼神 Merge Em All 1989 \nI am slop man \n410,757,864,530 AI PRs"
+          "眠いで忙しい。。。"
+          "ἔοικα γοῦν τούτου γε σμικρῷ τινι αὐτῷ τούτῳ σοφώτερος εἶναι, ὅτι ἃ μὴ οἶδα οὐδὲ οἴομαι εἰδέναι")
+        dashboard-startup-banner "~/Downloads/emacs.tiff"
         dashboard-navigator-buttons
         '(((nil "Projects" "Open ~/projects"
              (lambda (&rest _) (dired "~/projects")))
            (nil "Notes" "Open ~/notes"
             (lambda (&rest _) (dired "~/notes")))
            (nil "Standup" "Open the current standup note"
-            (lambda (&rest _) (my/open-standup-note)))))
+            (lambda (&rest _) (my/open-standup-note)))
+           (nil "PRs" "Open PRs assigned to me"
+            (lambda (&rest _)
+              (pr-review-search "is:pr archived:false assignee:@me is:open")))))
         dashboard-startupify-list
         '(dashboard-insert-banner
           dashboard-insert-newline
@@ -127,7 +132,6 @@
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-(package-refresh-contents)
 (use-package pilish)
 (setq pilish-evil-integration nil)
 
@@ -185,6 +189,8 @@
               c-basic-offset 4)
 
 ;;; ui
+(setq zone-when-idle 300)
+
 (defun config-dired-preview-buffer-p (buffer &rest _)
   (and (boundp 'dired-preview--buffers)
        (memq (get-buffer buffer) dired-preview--buffers)))
@@ -200,7 +206,7 @@
                         config-dired-preview-buffer-p))
                (display-buffer-same-window)))
 (defun config-switch-to-buffer-other-window (original buffer &optional norecord)
-  (if (or (derived-mode-p 'magit-mode)
+  (if (or (derived-mode-p 'magit-mode 'dired-mode)
           (config-magit-buffer-p buffer))
       (funcall original buffer norecord)
     (switch-to-buffer buffer norecord)))

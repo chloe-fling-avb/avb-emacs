@@ -1,0 +1,4 @@
+#+TITLE: README
+#+DATE: 2026-11-02
+
+A fork of my personal emacs setup for work. Mainly for notetaking/code editing.
