@@ -201,12 +201,16 @@
          (with-current-buffer buffer
            (derived-mode-p 'magit-mode)))))
 
+(defun config-dired-current-buffer-p (&rest _)
+  (derived-mode-p 'dired-mode))
+
 (add-to-list 'display-buffer-alist
              '((not (or (derived-mode . magit-mode)
-                        config-dired-preview-buffer-p))
+                        config-dired-preview-buffer-p
+                        config-dired-current-buffer-p))
                (display-buffer-same-window)))
 (defun config-switch-to-buffer-other-window (original buffer &optional norecord)
-  (if (or (derived-mode-p 'magit-mode 'dired-mode)
+  (if (or (derived-mode-p 'magit-mode)
           (config-magit-buffer-p buffer))
       (funcall original buffer norecord)
     (switch-to-buffer buffer norecord)))
