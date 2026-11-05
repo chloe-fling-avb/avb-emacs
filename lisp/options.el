@@ -68,6 +68,22 @@
 (custom-set-variables
  '(zoom-mode nil))
 
+;;; org-transclusion
+(use-package org-transclusion)
+
+(defun my/org-transclusion-default-keyword-values (string)
+  (append
+   (unless (org-transclusion-keyword-value-level string) '(:level 4))
+   (unless (org-transclusion-keyword-value-exclude-elements string)
+     '(:exclude-elements "drawer keyword"))))
+
+;;; http extension
+(with-eval-after-load 'org-transclusion
+  (add-to-list 'org-transclusion-keyword-value-functions
+               #'my/org-transclusion-default-keyword-values)
+  (add-to-list 'org-transclusion-extensions 'org-transclusion-http)
+  (require 'org-transclusion-http))
+
 ;;; ghostel
 (use-package ghostel
   :ensure t)

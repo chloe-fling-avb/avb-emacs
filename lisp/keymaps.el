@@ -135,6 +135,17 @@
         (find-file (cdr (assoc choice choices)))))))
 
 (evil-define-key 'normal 'global (kbd "<leader>t") #'my/org-find-file-by-filetag)
+(defun my/org-transclusion-insert-keyword ()
+  (interactive)
+  (insert "#+transclude: ")
+  (call-interactively #'org-insert-link))
+(evil-define-key 'normal 'global
+  (kbd "<leader>Ti") #'my/org-transclusion-insert-keyword)
+(evil-define-key 'normal 'global
+  (kbd "<leader>Ta") #'org-transclusion-add
+  (kbd "<leader>Td") #'org-transclusion-remove
+  (kbd "<leader>Tm") #'org-transclusion-transient-menu
+  (kbd "<leader>Tt") #'org-transclusion-mode)
 
 ;;; file browser, opens on current file
 (evil-define-key 'normal 'global (kbd "<leader>e") #'dired-jump)

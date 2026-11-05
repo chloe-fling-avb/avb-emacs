@@ -7,8 +7,9 @@
  '(package-selected-packages
    '(corfu-terminal dashboard diff-hl dired-preview ef-themes
                     evil-collection evil-org evil-snipe fireplace
-                    ghostel lua-mode nix-mode org-bullets pdf-tools
-                    pilish pr-review rainbow-mode rust-mode
+                    ghostel gnu-elpa-keyring-update lua-mode nix-mode
+                    org-bullets org-transclusion org-transclusion-http
+                    pdf-tools pilish pr-review rainbow-mode rust-mode
                     svelte-mode typescript-mode zoom))
  '(zoom-mode nil nil (zoom)))
 (custom-set-faces
