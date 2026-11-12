@@ -5,12 +5,13 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(corfu-terminal dashboard diff-hl dired-preview ef-themes
-                    evil-collection evil-org evil-snipe fireplace
-                    ghostel gnu-elpa-keyring-update lua-mode nix-mode
-                    org-bullets org-transclusion org-transclusion-http
-                    pdf-tools pilish pr-review rainbow-mode rust-mode
-                    svelte-mode typescript-mode zoom))
+   '(corfu-terminal dashboard diff-hl dired-preview doric-themes
+                    ef-themes evil-collection evil-org evil-snipe
+                    fireplace ghostel gnu-elpa-keyring-update lua-mode
+                    nix-mode olivetti org-bullets
+                    org-transclusion-http pdf-tools pilish pr-review
+                    rainbow-mode rust-mode svelte-mode typescript-mode
+                    zoom))
  '(zoom-mode nil nil (zoom)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
