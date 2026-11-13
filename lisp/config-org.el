@@ -46,12 +46,11 @@
   (insert "#+transclude: ")
   (call-interactively #'org-insert-link))
 
-(evil-define-key 'normal 'global
-  (kbd "<leader>Ti") #'my/org-transclusion-insert-keyword
-  (kbd "<leader>Ta") #'org-transclusion-add
-  (kbd "<leader>Td") #'org-transclusion-remove
-  (kbd "<leader>Tm") #'org-transclusion-transient-menu
-  (kbd "<leader>Tt") #'org-transclusion-mode)
+(my/leader "Ti" #'my/org-transclusion-insert-keyword)
+(my/leader "Ta" #'org-transclusion-add)
+(my/leader "Td" #'org-transclusion-remove)
+(my/leader "Tm" #'org-transclusion-transient-menu)
+(my/leader "Tt" #'org-transclusion-mode)
 
 ;;; quick tag search
 (defun my/org-find-file-by-filetag ()
@@ -81,21 +80,22 @@
              (choice (completing-read "Open note: " choices nil t)))
         (find-file (cdr (assoc choice choices)))))))
 
-(evil-define-key 'normal 'global (kbd "<leader>t") #'my/org-find-file-by-filetag)
+(my/leader "t" #'my/org-find-file-by-filetag)
 
 ;;; org agenda
-(evil-define-key 'normal 'global (kbd "<leader>a") #'org-agenda)
+(my/leader "a" #'org-agenda)
 
 (with-eval-after-load 'org-agenda
-  (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys)
-  (evil-define-key 'motion org-agenda-mode-map
-    (kbd (nth 1 winkeys)) #'org-agenda-next-line
-    (kbd (nth 2 winkeys)) #'org-agenda-previous-line
-    (kbd (concat "g" (nth 1 winkeys))) #'org-agenda-next-item
-    (kbd (concat "g" (nth 2 winkeys))) #'org-agenda-previous-item
-    (kbd (concat "C-" (nth 1 winkeys))) #'org-agenda-next-item
-    (kbd (concat "C-" (nth 2 winkeys))) #'org-agenda-previous-item))
+  (unless use-meow
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys)
+    (evil-define-key 'motion org-agenda-mode-map
+      (kbd (nth 1 winkeys)) #'org-agenda-next-line
+      (kbd (nth 2 winkeys)) #'org-agenda-previous-line
+      (kbd (concat "g" (nth 1 winkeys))) #'org-agenda-next-item
+      (kbd (concat "g" (nth 2 winkeys))) #'org-agenda-previous-item
+      (kbd (concat "C-" (nth 1 winkeys))) #'org-agenda-next-item
+      (kbd (concat "C-" (nth 2 winkeys))) #'org-agenda-previous-item)))
 
 ;;; prettiness
 (setq org-hide-emphasis-markers t)

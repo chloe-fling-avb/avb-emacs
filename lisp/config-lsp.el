@@ -13,7 +13,8 @@
   :custom (corfu-preselect 'prompt)
   :config
   (global-corfu-mode 1)
-  (add-hook 'evil-insert-state-exit-hook #'corfu-quit))
+  (add-hook (if use-meow 'meow-insert-exit-hook 'evil-insert-state-exit-hook)
+            #'corfu-quit))
 
 (use-package corfu-terminal
   :demand t

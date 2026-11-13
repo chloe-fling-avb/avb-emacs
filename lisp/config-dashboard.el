@@ -55,6 +55,6 @@
   (advice-add 'dashboard-get-agenda :around
               #'config-dashboard-agenda-with-diary))
 
-(evil-define-key 'normal 'global (kbd "<leader>d") #'dashboard-open)
+(my/leader "d" #'dashboard-open)
 
 (provide 'config-dashboard)

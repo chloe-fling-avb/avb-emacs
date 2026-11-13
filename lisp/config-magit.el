@@ -2,9 +2,9 @@
 (use-package magit
   :ensure t)
 
-(evil-define-key 'normal 'global (kbd "<leader>g") #'magit-status)
+(my/leader "g" #'magit-status)
 
-(when workman
+(when (and workman (not use-meow))
   (with-eval-after-load 'magit
     (evil-define-key 'normal magit-mode-map
       (kbd (nth 0 winkeys)) #'magit-section-up

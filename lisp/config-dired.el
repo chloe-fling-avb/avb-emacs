@@ -4,8 +4,9 @@
   :demand t
   :config
   (setq dired-preview-delay 0.7)
-  (add-to-list 'dired-preview-trigger-commands 'evil-next-line)
-  (add-to-list 'dired-preview-trigger-commands 'evil-previous-line)
+  (dolist (command (if use-meow '(meow-next meow-prev)
+                    '(evil-next-line evil-previous-line)))
+    (add-to-list 'dired-preview-trigger-commands command))
   (setq dired-preview-max-size (expt 2 20))
   (setq dired-preview-ignored-extensions
         '("mkv" "webm" "mp4"
@@ -15,21 +16,22 @@
   (dired-preview-global-mode 1))
 
 ;;; file browser, opens on current file
-(evil-define-key 'normal 'global (kbd "<leader>e") #'dired-jump)
+(my/leader "e" #'dired-jump)
 
 ;; yazi-style: left = parent, right = open
 (with-eval-after-load 'dired
-  (evil-define-key 'normal dired-mode-map
-    (kbd (nth 0 winkeys)) #'dired-up-directory
-    (kbd (nth 1 winkeys)) #'dired-next-line
-    (kbd (nth 2 winkeys)) #'dired-previous-line
-    (kbd (nth 3 winkeys)) #'dired-find-file
-    (kbd "RET") #'dired-find-file
-    (kbd "+") #'dired-create-directory
-    (kbd "C") #'dired-do-copy
-    (kbd "R") #'dired-do-rename))
+  (unless use-meow
+    (evil-define-key 'normal dired-mode-map
+      (kbd (nth 0 winkeys)) #'dired-up-directory
+      (kbd (nth 1 winkeys)) #'dired-next-line
+      (kbd (nth 2 winkeys)) #'dired-previous-line
+      (kbd (nth 3 winkeys)) #'dired-find-file
+      (kbd "RET") #'dired-find-file
+      (kbd "+") #'dired-create-directory
+      (kbd "C") #'dired-do-copy
+      (kbd "R") #'dired-do-rename)))
 
 ;;; fuzzy find project files
-(evil-define-key 'normal 'global (kbd "<leader>f") #'project-find-file)
+(my/leader "f" #'project-find-file)
 
 (provide 'config-dired)

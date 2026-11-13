@@ -3,10 +3,11 @@
 (require 'workman)
 
 ;;; easy window creation/killing
-(evil-define-key 'normal 'global (kbd "<leader>-") #'evil-window-split)
-(evil-define-key 'normal 'global (kbd "<leader>|") #'evil-window-vsplit)
-(evil-define-key 'normal 'global (kbd "<leader>wx") #'evil-window-delete)
-(evil-define-key 'normal 'global (kbd "<leader>x") (lambda () (interactive) (evil-delete-buffer nil t)))
+(my/leader "-" (if use-meow #'split-window-below #'evil-window-split))
+(my/leader "|" (if use-meow #'split-window-right #'evil-window-vsplit))
+(my/leader "wx" (if use-meow #'delete-window #'evil-window-delete))
+(my/leader "x" (if use-meow #'kill-current-buffer
+                 (lambda () (interactive) (evil-delete-buffer nil t))))
 
 ;;; ctrl + movement across emacs windows / tmux panes
 (defun tmux-nav (move flag)
@@ -17,25 +18,32 @@
       (user-error (when (getenv "TMUX")
                     (call-process "tmux" nil nil nil "select-pane" flag))))))
 
-(cl-loop for key in winkeys
-         for move in '(windmove-left windmove-down windmove-up windmove-right)
-         for flag in '("-L" "-D" "-U" "-R")
-         do (evil-define-key 'normal 'global (kbd (concat "C-" key)) (tmux-nav move flag)))
+(unless use-meow
+  (cl-loop for key in winkeys
+           for move in '(windmove-left windmove-down windmove-up windmove-right)
+           for flag in '("-L" "-D" "-U" "-R")
+           do (evil-define-key 'normal 'global (kbd (concat "C-" key)) (tmux-nav move flag)))
+
+  (evil-define-key '(normal visual) 'global
+    (kbd (nth 0 winkeys)) #'evil-backward-char
+    (kbd (nth 1 winkeys)) #'evil-next-visual-line
+    (kbd (nth 2 winkeys)) #'evil-previous-visual-line
+    (kbd (nth 3 winkeys)) #'evil-forward-char))
 
 ;;; resize windows with C-S-<direction>
-(evil-define-key 'normal 'global (kbd "C-S-<up>") (lambda () (interactive) (evil-window-decrease-height 2)))
-(evil-define-key 'normal 'global (kbd "C-S-<down>") (lambda () (interactive) (evil-window-increase-height 2)))
-(evil-define-key 'normal 'global (kbd "C-S-<right>") (lambda () (interactive) (evil-window-decrease-width 2)))
-(evil-define-key 'normal 'global (kbd "C-S-<left>") (lambda () (interactive) (evil-window-increase-width 2)))
-
-(evil-define-key '(normal visual) 'global
-  (kbd (nth 0 winkeys)) #'evil-backward-char
-  (kbd (nth 1 winkeys)) #'evil-next-visual-line
-  (kbd (nth 2 winkeys)) #'evil-previous-visual-line
-  (kbd (nth 3 winkeys)) #'evil-forward-char)
+(if use-meow
+    (meow-normal-define-key
+     (cons "C-S-<up>" (lambda () (interactive) (shrink-window 2)))
+     (cons "C-S-<down>" (lambda () (interactive) (enlarge-window 2)))
+     (cons "C-S-<right>" (lambda () (interactive) (shrink-window-horizontally 2)))
+     (cons "C-S-<left>" (lambda () (interactive) (enlarge-window-horizontally 2))))
+  (evil-define-key 'normal 'global (kbd "C-S-<up>") (lambda () (interactive) (evil-window-decrease-height 2)))
+  (evil-define-key 'normal 'global (kbd "C-S-<down>") (lambda () (interactive) (evil-window-increase-height 2)))
+  (evil-define-key 'normal 'global (kbd "C-S-<right>") (lambda () (interactive) (evil-window-decrease-width 2)))
+  (evil-define-key 'normal 'global (kbd "C-S-<left>") (lambda () (interactive) (evil-window-increase-width 2))))
 
 ;;; quick buffers
-(evil-define-key 'normal 'global (kbd "<leader>b") #'switch-to-buffer)
+(my/leader "b" #'switch-to-buffer)
 
 (defun config-dired-preview-buffer-p (buffer &rest _)
   (and (boundp 'dired-preview--buffers)

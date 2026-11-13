@@ -3,7 +3,7 @@
 
 (defvar winkeys (if workman '("y" "n" "e" "o") '("h" "j" "k" "l")))
 
-(when workman
+(when (and workman (not use-meow))
   (evil-define-key '(normal visual) 'global (kbd "M-y") #'evil-yank)
   (evil-define-key 'normal 'global
     (kbd "M-n") #'evil-search-next

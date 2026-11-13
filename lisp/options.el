@@ -126,6 +126,7 @@
 
 ;;; flash
 (use-package evil-snipe
+  :unless use-meow
   :demand t
   :after evil
   :custom (evil-snipe-scope 'visible)
@@ -135,11 +136,11 @@
 (use-package rainbow-mode :hook (prog-mode text-mode))
 
 ;;; change cursor in insert mode (terminal frames only)
-(add-hook 'evil-insert-state-entry-hook
+(add-hook (if use-meow 'meow-insert-enter-hook 'evil-insert-state-entry-hook)
           (lambda ()
             (unless (display-graphic-p)
               (send-string-to-terminal "\033[5 q"))))
-(add-hook 'evil-insert-state-exit-hook
+(add-hook (if use-meow 'meow-insert-exit-hook 'evil-insert-state-exit-hook)
           (lambda ()
             (unless (display-graphic-p)
               (send-string-to-terminal "\033[2 q"))))

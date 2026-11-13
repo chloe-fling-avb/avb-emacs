@@ -26,7 +26,7 @@
     (setq buffer-read-only nil)
     (goto-char (point-min))
     (search-forward "\n\n" nil t)
-    (evil-insert-state)))
+    (if use-meow (meow-insert) (evil-insert-state))))
 
 (defun create-org-note ()
   (interactive)
@@ -67,6 +67,6 @@
       (my/org-create-note-from-template "standup" target-date previous-date
                                          target-date filepath))))
 
-(evil-define-key 'normal 'global (kbd "<leader>+") #'create-org-note)
+(my/leader "+" #'create-org-note)
 
 (provide 'config-org-notes)
