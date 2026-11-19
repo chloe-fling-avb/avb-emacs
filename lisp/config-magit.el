@@ -2,8 +2,6 @@
 (use-package magit
   :ensure t)
 
-(my/leader "g" #'magit-status)
-
 (when (and workman (not use-meow))
   (with-eval-after-load 'magit
     (evil-define-key 'normal magit-mode-map

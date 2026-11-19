@@ -15,9 +15,6 @@
           ".DS_Store"))
   (dired-preview-global-mode 1))
 
-;;; file browser, opens on current file
-(my/leader "e" #'dired-jump)
-
 ;; yazi-style: left = parent, right = open
 (with-eval-after-load 'dired
   (unless use-meow
