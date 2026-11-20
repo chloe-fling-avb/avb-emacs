@@ -85,23 +85,22 @@
 ;;; org agenda
 (my/leader "a" #'org-agenda)
 
-(with-eval-after-load 'org-agenda
-  (unless use-meow
-    (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys)
-    (evil-define-key 'motion org-agenda-mode-map
-      (kbd (nth 1 winkeys)) #'org-agenda-next-line
-      (kbd (nth 2 winkeys)) #'org-agenda-previous-line
-      (kbd (concat "g" (nth 1 winkeys))) #'org-agenda-next-item
-      (kbd (concat "g" (nth 2 winkeys))) #'org-agenda-previous-item
-      (kbd (concat "C-" (nth 1 winkeys))) #'org-agenda-next-item
-      (kbd (concat "C-" (nth 2 winkeys))) #'org-agenda-previous-item)))
-
 ;;; prettiness
 (setq org-hide-emphasis-markers t)
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
                            (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+
+(add-hook 'org-mode-hook #'olivetti-mode)
+
+(use-package olivetti
+  :ensure t)
+
+(use-package org-modern
+  :ensure t
+  :demand t
+  :config
+  (global-org-modern-mode 1))
 
 ;;; diary in a sensible location
 (setq diary-file "~/notes/diary"

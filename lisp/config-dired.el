@@ -4,8 +4,7 @@
   :demand t
   :config
   (setq dired-preview-delay 0.7)
-  (dolist (command (if use-meow '(meow-next meow-prev)
-                    '(evil-next-line evil-previous-line)))
+  (dolist (command '(meow-next meow-prev))
     (add-to-list 'dired-preview-trigger-commands command))
   (setq dired-preview-max-size (expt 2 20))
   (setq dired-preview-ignored-extensions
@@ -17,16 +16,10 @@
 
 ;; yazi-style: left = parent, right = open
 (with-eval-after-load 'dired
-  (unless use-meow
-    (evil-define-key 'normal dired-mode-map
-      (kbd (nth 0 winkeys)) #'dired-up-directory
-      (kbd (nth 1 winkeys)) #'dired-next-line
-      (kbd (nth 2 winkeys)) #'dired-previous-line
-      (kbd (nth 3 winkeys)) #'dired-find-file
-      (kbd "RET") #'dired-find-file
-      (kbd "+") #'dired-create-directory
-      (kbd "C") #'dired-do-copy
-      (kbd "R") #'dired-do-rename)))
+  (define-key dired-mode-map (kbd "RET") #'dired-find-file)
+  (define-key dired-mode-map (kbd "+") #'dired-create-directory)
+  (define-key dired-mode-map (kbd "C") #'dired-do-copy)
+  (define-key dired-mode-map (kbd "R") #'dired-do-rename))
 
 ;;; fuzzy find project files
 (my/leader "f" #'project-find-file)

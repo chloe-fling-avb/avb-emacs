@@ -26,7 +26,7 @@
     (setq buffer-read-only nil)
     (goto-char (point-min))
     (search-forward "\n\n" nil t)
-    (if use-meow (meow-insert) (evil-insert-state))))
+    (meow-insert)))
 
 (defun create-org-note ()
   (interactive)

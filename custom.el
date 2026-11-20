@@ -6,12 +6,12 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    '(corfu-terminal dashboard diff-hl dired-preview doric-themes
-                    ef-themes evil-collection evil-org evil-snipe
+                    ef-themes
                     fireplace ghostel gnu-elpa-keyring-update lua-mode
-                    nix-mode nov olivetti org-bullets
+                    nix-mode nov olivetti org-bullets org-modern
                     org-transclusion-http pdf-tools pilish pr-review
                     rainbow-mode rust-mode svelte-mode typescript-mode
-                    zoom))
+                    yafolding zoom))
  '(zoom-mode nil nil (zoom)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

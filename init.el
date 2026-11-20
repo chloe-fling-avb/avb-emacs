@@ -1,15 +1,14 @@
 ;;; -*- lexical-binding: t -*-
-(defvar use-meow t)
 (defvar workman t)
 
 (add-to-list 'load-path (expand-file-name "lisp" (file-name-directory load-file-name)))
 
 (require 'options)
-(if use-meow (require 'config-meow) (require 'config-evil))
-(require 'keymaps)
 (require 'workman)
+(require 'config-meow)
+(config-meow-enable)
+(require 'keymaps)
 (require 'windows)
-(when use-meow (config-meow-enable))
 (require 'config-dired)
 (require 'config-magit)
 (require 'config-lsp)

@@ -175,7 +175,7 @@
 
 ;; Special modes (dashboard, eww, dired, magit...) start in MOTION state,
 ;; where only the keys below plus the mode's own keymap exist. Stand in for
-;; evil-collection: down/up everywhere, left/right per mode.
+;; Down/up everywhere, left/right per mode.
 (defun config-meow-motion-keys ()
   (meow-motion-define-key
    (cons (nth 1 winkeys) #'meow-next)

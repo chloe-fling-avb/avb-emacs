@@ -12,7 +12,7 @@
           "ＢＯＲＮ ＴＯ ＤＩＥ \nWORLD IS A FUCK \n鬼神 Merge Em All 1989 \nI am slop man \n410,757,864,530 AI PRs"
           "眠いで忙しい。。。"
           "ἔοικα γοῦν τούτου γε σμικρῷ τινι αὐτῷ τούτῳ σοφώτερος εἶναι, ὅτι ἃ μὴ οἶδα οὐδὲ οἴομαι εἰδέναι")
-        dashboard-startup-banner "~/Downloads/emacs.tiff"
+        dashboard-startup-banner "~/Downloads/emacs_break_link.tiff"
         dashboard-navigator-buttons
         '(((nil "Projects" "Open ~/projects"
              (lambda (&rest _) (dired "~/projects")))

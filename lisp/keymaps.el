@@ -1,11 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 (defun my/leader (key command)
-  (if use-meow
-      (meow-leader-define-key (cons (mapconcat #'string key " ") command))
-    (evil-define-key 'normal 'global (kbd (concat "<leader>" key)) command)))
+  (meow-leader-define-key (cons (mapconcat #'string key " ") command)))
 
-(when use-meow
-  (global-set-key (kbd "C-<down>") #'completion-at-point))
+(global-set-key (kbd "C-<down>") #'completion-at-point)
 
 (my/leader "i" #'set-input-method)
 

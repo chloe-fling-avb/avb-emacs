@@ -16,10 +16,18 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
-;;; zoom mode
-(use-package zoom)
-(custom-set-variables
- '(zoom-mode nil))
+;;; hide menubar (macos)
+(add-to-list 'default-frame-alist
+             '(ns-transparent-titlebar . t))
+
+;;; code folding
+(use-package yafolding
+  :ensure t
+  :defer 10
+  :hook (prog-mode . yafolding-mode))
+
+;;; fido for m-x completions
+(fido-vertical-mode 1)
 
 ;;; NOTE: i am keenly aware both of these packages violate my personal AI policy.
 
@@ -28,33 +36,11 @@
 
 ;;; pilish
 (use-package pilish
-  :commands pilish
-  :init (setq pilish-evil-integration nil))
+  :commands pilish)
 
-;;; clipboard/mouse
+;;; mouse
 (xterm-mouse-mode 1)
 (mouse-wheel-mode 1)
-
-(defvar terminal-copied nil)
-
-(defun clipboard-setup (copy-cmd paste-cmd)
-  "Route the kill ring through COPY-CMD and PASTE-CMD (shell command strings)."
-  (setq interprogram-cut-function
-        (lambda (text)
-          (setq terminal-copied text)
-          (let ((proc (make-process :name copy-cmd :command (list copy-cmd)
-                                    :connection-type 'pipe :noquery t)))
-            (process-send-string proc text)
-            (process-send-eof proc)))
-        interprogram-paste-function
-        (lambda ()
-          (let ((text (shell-command-to-string (concat paste-cmd " 2>/dev/null"))))
-            (unless (or (string-empty-p text) (equal text terminal-copied)) text)))))
-
-(unless (display-graphic-p)
-  (pcase system-type
-    ('darwin (clipboard-setup "pbcopy" "pbpaste"))
-    ('gnu/linux (clipboard-setup "wl-copy" "wl-paste -n"))))
 
 ;;; tab
 (setq-default tab-width 4
@@ -62,14 +48,13 @@
               c-basic-offset 4)
 
 ;;; ui
-(setq zone-when-idle 300)
 (set-face-attribute 'default nil :family "Aporetic Serif Mono" :height 180)
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
 (global-hl-line-mode 1)
-(fido-vertical-mode 1)
-(define-key icomplete-minibuffer-map (kbd "M-RET") #'icomplete-fido-exit)
-(use-package doric-themes :demand t :config (load-theme 'doric-obsidian t))
+(add-to-list 'custom-theme-load-path (file-name-directory (locate-library "cappuccino-noir-theme")))
+(use-package doric-themes :demand t)
+(load-theme 'cappuccino-noir t)
 
 ;;; statusline
 (defun stl-filepath ()
@@ -98,7 +83,7 @@
   (when (and vc-mode (string-match "Git.\\(.+\\)" vc-mode))
     (let ((head (match-string-no-properties 1 vc-mode)))
       (pcase-let ((`(,added ,changed ,removed) stl-git-counts))
-        (concat "[\ue725 " ; branch icon
+        (concat "[λ "
                 head
                 (and added (> added 0) (format " +%d" added))
                 (and changed (> changed 0) (format " ~%d" changed))
@@ -124,23 +109,15 @@
 ;; refresh clock once a minute
 (run-at-time t 60 #'force-mode-line-update t)
 
-;;; flash
-(use-package evil-snipe
-  :unless use-meow
-  :demand t
-  :after evil
-  :custom (evil-snipe-scope 'visible)
-  :config (evil-snipe-override-mode 1))
-
 ;;; colorizer
 (use-package rainbow-mode :hook (prog-mode text-mode))
 
 ;;; change cursor in insert mode (terminal frames only)
-(add-hook (if use-meow 'meow-insert-enter-hook 'evil-insert-state-entry-hook)
+(add-hook 'meow-insert-enter-hook
           (lambda ()
             (unless (display-graphic-p)
               (send-string-to-terminal "\033[5 q"))))
-(add-hook (if use-meow 'meow-insert-exit-hook 'evil-insert-state-exit-hook)
+(add-hook 'meow-insert-exit-hook
           (lambda ()
             (unless (display-graphic-p)
               (send-string-to-terminal "\033[2 q"))))
