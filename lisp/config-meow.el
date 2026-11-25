@@ -163,6 +163,7 @@
    '("<escape>" . ignore)))
 
 (defun config-meow-setup ()
+  (setf (alist-get 'leader meow-keymap-alist) (make-sparse-keymap))
   (if workman (config-meow-setup-workman) (config-meow-setup-qwerty))
   (setq meow-keypad-start-keys '((?c . ?c) (?h . ?h) (?x . ?x) (?m . ?m)))
   (unless workman

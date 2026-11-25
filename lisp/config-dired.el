@@ -21,7 +21,4 @@
   (define-key dired-mode-map (kbd "C") #'dired-do-copy)
   (define-key dired-mode-map (kbd "R") #'dired-do-rename))
 
-;;; fuzzy find project files
-(my/leader "f" #'project-find-file)
-
 (provide 'config-dired)

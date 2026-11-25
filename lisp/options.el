@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t -*-
+;; -*- lexical-binding: t -*-
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (require 'use-package)
@@ -16,38 +16,42 @@
 (when (fboundp 'scroll-bar-mode)
   (scroll-bar-mode -1))
 
-;;; hide menubar (macos)
+;; hide menubar (macos)
 (add-to-list 'default-frame-alist
              '(ns-transparent-titlebar . t))
 
-;;; code folding
+;; code folding
 (use-package yafolding
   :ensure t
   :defer 10
   :hook (prog-mode . yafolding-mode))
 
-;;; fido for m-x completions
+;; fido for m-x completions
 (fido-vertical-mode 1)
 
-;;; NOTE: i am keenly aware both of these packages violate my personal AI policy.
+;; which-key for normal chord completions
+(which-key-mode 1)
+(setq which-key-idle-delay 0.1)
 
-;;; ghostel
+;; NOTE: i am keenly aware both of these packages violate my personal AI policy.
+
+;; ghostel
 (use-package ghostel :commands ghostel)
 
-;;; pilish
+;; pilish
 (use-package pilish
   :commands pilish)
 
-;;; mouse
+;; mouse
 (xterm-mouse-mode 1)
 (mouse-wheel-mode 1)
 
-;;; tab
+;; tab
 (setq-default tab-width 4
               indent-tabs-mode nil
               c-basic-offset 4)
 
-;;; ui
+;; ui
 (set-face-attribute 'default nil :family "Aporetic Serif Mono" :height 180)
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode 1)
@@ -56,7 +60,7 @@
 (use-package doric-themes :demand t)
 (load-theme 'cappuccino-noir t)
 
-;;; statusline
+;; statusline
 (defun stl-filepath ()
   (when buffer-file-name
     (let* ((dir (file-name-directory buffer-file-name))
@@ -109,10 +113,10 @@
 ;; refresh clock once a minute
 (run-at-time t 60 #'force-mode-line-update t)
 
-;;; colorizer
+;; colorizer
 (use-package rainbow-mode :hook (prog-mode text-mode))
 
-;;; change cursor in insert mode (terminal frames only)
+;; change cursor in insert mode (terminal frames only)
 (add-hook 'meow-insert-enter-hook
           (lambda ()
             (unless (display-graphic-p)

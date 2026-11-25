@@ -5,7 +5,7 @@
   '(("hiring" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+REPO:\n#+SITE:\n#+CATEGORY: hiring\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* SPA\n** Pros\n** Cons\n\n* Repo\n** Pros\n** Cons\n\n* Decision\n")
     ("standup" . "#+TITLE: {{tmrw date}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+CATEGORY: standup\n\n* TODO Yesterday\nDEADLINE: <{{date}}>\n** Dev\n** Review\n\n* TODO Today\nDEADLINE: <{{tmrw date}} 10:00>\n** Dev\n** Review\n\n* Push\n")
     ("dev" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: dev\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* TODO Issue\n* TODO Functional Requirements [/]\n* TODO Fix\n* TODO Review\n")
-    ("review" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: review\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* TODO Issue\n* TODO Review\n")
+    ("review" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+LoC:\n#+CATEGORY: review\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n* TODO Issue\n* TODO Review\n")
     ("generic" . "#+TITLE: {{title}}\n#+DATE: {{date}}\n#+FILETAGS:\n#+PR:\n#+CATEGORY: generic\n#+BEGIN: clocktable :scope file\n#+END\n#+COLUMNS: %50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM\n\n"))
   "Org note templates. Use {{title}}, {{date}}, and {{tmrw date}} placeholders."
   :type '(alist :key-type (string :tag "Template name")
@@ -26,7 +26,8 @@
     (setq buffer-read-only nil)
     (goto-char (point-min))
     (search-forward "\n\n" nil t)
-    (meow-insert)))
+    (when (and (fboundp 'meow-normal-mode-p) (meow-normal-mode-p))
+      (meow-insert))))
 
 (defun create-org-note ()
   (interactive)
@@ -67,6 +68,6 @@
       (my/org-create-note-from-template "standup" target-date previous-date
                                          target-date filepath))))
 
-(my/leader "+" #'create-org-note)
+(my/c-c-key "+" #'create-org-note)
 
 (provide 'config-org-notes)

@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t -*-
+;; -*- lexical-binding: t -*-
 (setq org-startup-truncated nil
       org-log-done 'time
       org-todo-keywords '((sequence "TODO" "IN PROGRESS" "|" "DONE")))
@@ -24,7 +24,7 @@
   (setq org-columns-default-format
         "%50ITEM(Task) %10Effort(Effort){:} %10CLOCKSUM"))
 
-;;; org-transclusion
+;; org-transclusion
 (use-package org-transclusion
   :commands (org-transclusion-add org-transclusion-remove
              org-transclusion-transient-menu org-transclusion-mode))
@@ -46,13 +46,13 @@
   (insert "#+transclude: ")
   (call-interactively #'org-insert-link))
 
-(my/leader "Ti" #'my/org-transclusion-insert-keyword)
-(my/leader "Ta" #'org-transclusion-add)
-(my/leader "Td" #'org-transclusion-remove)
-(my/leader "Tm" #'org-transclusion-transient-menu)
-(my/leader "Tt" #'org-transclusion-mode)
+(my/c-c-key "T i" #'my/org-transclusion-insert-keyword)
+(my/c-c-key "T a" #'org-transclusion-add)
+(my/c-c-key "T d" #'org-transclusion-remove)
+(my/c-c-key "T m" #'org-transclusion-transient-menu)
+(my/c-c-key "T t" #'org-transclusion-mode)
 
-;;; quick tag search
+;; quick tag search
 (defun my/org-find-file-by-filetag ()
   (interactive)
   (let (tag-files)
@@ -80,12 +80,12 @@
              (choice (completing-read "Open note: " choices nil t)))
         (find-file (cdr (assoc choice choices)))))))
 
-(my/leader "t" #'my/org-find-file-by-filetag)
+(my/c-c-key "t" #'my/org-find-file-by-filetag)
 
-;;; org agenda
-(my/leader "a" #'org-agenda)
+;; org agenda
+(my/c-c-key "a" #'org-agenda)
 
-;;; prettiness
+;; prettiness
 (setq org-hide-emphasis-markers t)
 (font-lock-add-keywords 'org-mode
                         '(("^ *\\([-]\\) "
@@ -96,17 +96,19 @@
 (use-package olivetti
   :ensure t)
 
+(setq-default olivetti-body-width 100)
+
 (use-package org-modern
   :ensure t
   :demand t
   :config
   (global-org-modern-mode 1))
 
-;;; diary in a sensible location
+;; diary in a sensible location
 (setq diary-file "~/notes/diary"
       org-agenda-include-diary t)
 
-;;; appt reminders
+;; appt reminders
 (require 'appt)
 (setq appt-message-warning-time 5
       appt-display-interval 1)

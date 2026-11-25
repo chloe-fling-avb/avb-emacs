@@ -2,12 +2,7 @@
 (require 'keymaps)
 (require 'workman)
 
-;;; resize windows with C-S-<direction>
-(meow-normal-define-key
- (cons "C-S-<up>" (lambda () (interactive) (shrink-window 2)))
- (cons "C-S-<down>" (lambda () (interactive) (enlarge-window 2)))
- (cons "C-S-<right>" (lambda () (interactive) (shrink-window-horizontally 2)))
- (cons "C-S-<left>" (lambda () (interactive) (enlarge-window-horizontally 2))))
+(setq winner-mode t)
 
 (defun config-dired-preview-buffer-p (buffer &rest _)
   (and (boundp 'dired-preview--buffers)

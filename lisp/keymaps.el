@@ -1,10 +1,10 @@
 ;;; -*- lexical-binding: t -*-
-(defun my/leader (key command)
-  (meow-leader-define-key (cons (mapconcat #'string key " ") command)))
+(defun my/c-c-key (key command)
+  (define-key mode-specific-map (kbd key) command))
 
 (global-set-key (kbd "C-<down>") #'completion-at-point)
 
-(my/leader "i" #'set-input-method)
+(my/c-c-key "i" #'set-input-method)
 
 ;;; windmove
 (windmove-default-keybindings)

@@ -4,18 +4,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(corfu-terminal dashboard diff-hl dired-preview doric-themes
-                    ef-themes
-                    fireplace ghostel gnu-elpa-keyring-update lua-mode
-                    nix-mode nov olivetti org-bullets org-modern
-                    org-transclusion-http pdf-tools pilish pr-review
-                    rainbow-mode rust-mode svelte-mode typescript-mode
-                    yafolding zoom))
- '(zoom-mode nil nil (zoom)))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(variable-pitch ((t (:family "Aporetic Serif")))))

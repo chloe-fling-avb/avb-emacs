@@ -55,6 +55,6 @@
   (advice-add 'dashboard-get-agenda :around
               #'config-dashboard-agenda-with-diary))
 
-(my/leader "d" #'dashboard-open)
+(my/c-c-key "d" #'dashboard-open)
 
 (provide 'config-dashboard)
