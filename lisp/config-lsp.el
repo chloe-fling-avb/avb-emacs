@@ -1,5 +1,5 @@
-;;; -*- lexical-binding: t -*-
-;;; langs
+;; -*- lexical-binding: t -*-
+;; langs
 (use-package nix-mode)
 (use-package svelte-mode)
 (use-package typescript-mode)
@@ -7,7 +7,7 @@
 (use-package lua-mode :custom (lua-indent-level 4))
 (use-package markdown-mode :custom (markdown-header-scaling t))
 
-;;; lsp
+;; lsp
 (use-package corfu
   :demand t
   :custom (corfu-preselect 'prompt)

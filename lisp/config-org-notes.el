@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t -*-
+;; -*- lexical-binding: t -*-
 (require 'config-org)
 
 (defcustom my/org-note-templates

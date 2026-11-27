@@ -1,6 +1,5 @@
 ;;; -*- lexical-binding: t -*-
 (require 'keymaps)
-(require 'workman)
 
 (setq winner-mode t)
 

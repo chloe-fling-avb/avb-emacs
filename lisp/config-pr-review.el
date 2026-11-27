@@ -37,8 +37,6 @@
             (propertize "| " 'face 'line-number))))))))
 
 (with-eval-after-load 'pr-review
-  (advice-add 'pr-review--refresh-internal :after #'my-pr-review-show-diff-line-numbers)
-  (define-key pr-review-mode-map (kbd (nth 0 winkeys)) #'backward-char)
-  (define-key pr-review-mode-map (kbd (nth 3 winkeys)) #'forward-char))
+  (advice-add 'pr-review--refresh-internal :after #'my-pr-review-show-diff-line-numbers))
 
 (provide 'config-pr-review)
